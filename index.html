@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SureDrop REST API Documentation</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --bg-color: #ffffff;
+            --text-color: #34495e;
+            --light-grey: #f8f9fa;
+            --dark-grey: #7f8c8d;
+            --sidebar-bg: #2c3e50;
+            --sidebar-text: #ecf0f1;
+            --sidebar-hover: #34495e;
+            --code-bg: #e9ecef;
+            --code-text: #333;
+            --border-color: #dee2e6;
+            --method-get: #2ecc71;
+            --method-post: #3498db;
+            --method-put: #f39c12;
+            --method-delete: #e74c3c;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            line-height: 1.7;
+        }
+
+        .sidebar {
+            width: 320px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+            scrollbar-width: thin;
+            scrollbar-color: var(--sidebar-hover) var(--sidebar-bg);
+        }
+        
+        .sidebar::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+          background: var(--sidebar-bg);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+          background-color: var(--sidebar-hover);
+          border-radius: 6px;
+        }
+
+        .sidebar h1 {
+            font-size: 1.5em;
+            margin: 0 0 20px 0;
+            color: white;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--sidebar-hover);
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar nav ul li a {
+            color: var(--sidebar-text);
+            text-decoration: none;
+            display: block;
+            padding: 8px 10px;
+            border-radius: 4px;
+            font-size: 0.95em;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        
+        .sidebar nav ul > li > a {
+            font-weight: bold;
+        }
+
+        .sidebar nav ul ul {
+            padding-left: 15px;
+            margin-top: 5px;
+        }
+        
+        .sidebar nav ul ul li a {
+            font-weight: normal;
+            font-size: 0.9em;
+            padding: 6px 10px;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            background-color: var(--sidebar-hover);
+            color: white;
+        }
+
+        .main-content {
+            margin-left: 320px;
+            padding: 40px;
+            width: calc(100% - 320px);
+        }
+        
+        .main-content h1 {
+            font-size: 2.8em;
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-top: 0;
+        }
+
+        section {
+            margin-bottom: 40px;
+            padding-top: 40px; /* For anchor offset */
+        }
+        
+        h2 {
+            font-size: 2.2em;
+            color: var(--secondary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            font-size: 1.7em;
+            color: var(--primary-color);
+            margin-top: 30px;
+        }
+        
+        h4 {
+            font-size: 1.3em;
+            color: var(--secondary-color);
+        }
+
+        p, ul, ol {
+            margin-bottom: 15px;
+        }
+        
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--accent-color);
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--code-text);
+            font-size: 0.9em;
+        }
+        
+        blockquote {
+            border-left: 4px solid var(--primary-color);
+            padding: 10px 20px;
+            margin: 20px 0;
+            background-color: var(--light-grey);
+        }
+        
+        blockquote strong {
+            color: var(--secondary-color);
+        }
+
+        .api-endpoint {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin: 25px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .api-endpoint-header {
+            padding: 15px 20px;
+            background-color: var(--light-grey);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .api-endpoint-header h4 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+        
+        .api-endpoint-details {
+            padding: 20px;
+        }
+        
+        .api-endpoint-path {
+            background-color: #fff;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .api-method {
+            padding: 5px 10px;
+            border-radius: 3px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .get { background-color: var(--method-get); }
+        .post { background-color: var(--method-post); }
+        .put { background-color: var(--method-put); }
+        .delete { background-color: var(--method-delete); }
+        
+        .tldr-case {
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .tldr-case-header {
+            background-color: var(--light-grey);
+            padding: 10px 15px;
+            font-weight: bold;
+            font-size: 1.1em;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tldr-case-body {
+            padding: 0 15px 15px 15px;
+        }
+        
+        .tldr-case h5 {
+            font-size: 1em;
+            color: var(--dark-grey);
+            margin: 15px 0 5px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th {
+            background-color: var(--light-grey);
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+                max-height: 50vh;
+                border-bottom: 2px solid var(--secondary-color);
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 20px;
+            }
+             section {
+                padding-top: 20px;
+             }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <h1>SureDrop API</h1>
+        <nav>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#swagger-definitions">Swagger Definitions</a></li>
+                <li><a href="#authentication">Authentication</a></li>
+                <li><a href="#api-endpoints">API Endpoints</a>
+                    <ul>
+                        <li><a href="#auth-session">1. Authentication</a></li>
+                        <li><a href="#user-management">2. User Management</a></li>
+                        <li><a href="#password-management">3. Password Management</a></li>
+                        <li><a href="#group-management">4. Group Management</a></li>
+                        <li><a href="#policy-template">5. Policy & Templates</a></li>
+                        <li><a href="#document-management">6. Document Management</a></li>
+                        <li><a href="#file-folder">7. File & Folder Mgmt</a></li>
+                        <li><a href="#content-delivery">8. Content Delivery</a></li>
+                        <li><a href="#sharing-collaboration">9. Sharing & Collaboration</a></li>
+                        <li><a href="#email-messaging">10. Email & Messaging</a></li>
+                        <li><a href="#system-admin">11. System Administration</a></li>
+                        <li><a href="#device-management">12. Device Management</a></li>
+                        <li><a href="#monitoring-analytics">13. Monitoring & Analytics</a></li>
+                        <li><a href="#utility-functions">14. Utility Functions</a></li>
+                        <li><a href="#database-ops">15. Database Operations</a></li>
+                    </ul>
+                </li>
+                <li><a href="#error-handling">Error Handling</a></li>
+                <li><a href="#tldr">TL;DR - Examples</a></li>
+                <li><a href="#swagger-list">Full API List</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1>SureDrop REST API Documentation</h1>
+        </header>
+
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>The SureDrop REST API provides comprehensive functionality for file management, user authentication, group collaboration, and secure document sharing. All API endpoints require authentication unless otherwise specified.</p>
+            <blockquote>
+                <strong>Important Note:</strong> This documentation provides an overview of the main API endpoints but is not exhaustive. For the complete and comprehensive list of all available API calls, including detailed request/response schemas and additional parameters, please refer to the <code>swagger.json</code> file or access the interactive Swagger documentation at <code>/rest/help</code> on your SureDrop instance.
+            </blockquote>
+        </section>
+        
+        <section id="swagger-definitions">
+            <h2>Accessing Swagger Definitions</h2>
+            <p>Accessing Swagger definitions may only be done on an on-premises instance of SureDrop; Swagger definitions are disabled by default for all cloud instances.</p>
+            <p>To access the <code>swagger.json</code> definition file, edit the following file:</p>
+            <pre><code>C:\ProgramData\docker\volumes\suredrop_ngix-reverse-proxy-shared\_data\client.conf</code></pre>
+            <p>Add the following lines:</p>
+            <pre><code>location /api-docs/swagger.json {
+    proxy_pass   http://rest-api/api-docs/swagger.json;
+}</code></pre>
+            <p>Restart SureDrop:</p>
+            <pre><code>suredrop stop
+suredrop start</code></pre>
+            <p>The Swagger definitions will now be available at:</p>
+            <pre><code>https://[your-suredrop-url]/api-docs/swagger.json</code></pre>
+            <p><em>Please note, there is no <code>SwaggerUI</code> configured at this address.</em></p>
+        </section>
+
+        <section id="authentication">
+            <h2>Authentication</h2>
+            <p>All API endpoints are prefixed with <code>/rest/</code> in the base URL.</p>
+            <p>Most endpoints require three authentication parameters:</p>
+            <ul>
+                <li><code>prefix</code> - Company name or routing code</li>
+                <li><code>username</code> - User's username</li>
+                <li><code>token</code> - Session token obtained from login</li>
+                <li><code>secure</code> - Optional secure token for enhanced security</li>
+            </ul>
+            <p>The session token can also be passed as an Authorization header using Basic Authentication, with the token in the password field and a blank username.</p>
+            <pre><code>Authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre>
+        </section>
+        
+        <section id="api-endpoints">
+            <h2>API Endpoints</h2>
+
+            <h3 id="auth-session">1. Authentication & Session Management</h3>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Login / Get Session Token</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/session?prefix={prefix}&username={username}</code></div><p><strong>Description:</strong> Authenticate user and get session token.</p><p><strong>Body:</strong> JSON with <code>password</code>, optional <code>token</code> (2FA), optional <code>read_only</code>.</p><p><strong>Returns:</strong> Session token and user information.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Validate QR Code</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/user/validate_qrcode?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Validates a QR code for 2FA authentication.</p><p><strong>Returns:</strong> Validation status</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get QR Code</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/user/qrcode?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Generates a QR code for 2FA setup.</p><p><strong>Returns:</strong> QR code data</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Logout All Non-Admin Users</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/maintenance?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Logs out all non-admin users (maintenance mode).</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Session Tokens</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/user/sessions?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Retrieve active session information.</p><p><strong>Returns:</strong> List of active sessions with timestamps</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Unlock Account</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/unlock_account?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Unlock a locked user account.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Add Device</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/device?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Register a new device for authentication.</p><p><strong>Body:</strong> Device information</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Delete Device</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/device/{device}?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Remove a registered device.</p></div></div>
+
+            <h3 id="user-management">2. User Management</h3>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get User Information</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/user?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Get current user's information.</p><p><strong>Returns:</strong> User profile data</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Create User</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/user?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Create a new user account.</p><p><strong>Body:</strong> User details (first_name, last_name, email, etc.)</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Update User</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method put">PUT</span> <code>/rest/user?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Update user information.</p><p><strong>Body:</strong> Updated user fields</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Update User Status</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method put">PUT</span> <code>/rest/user/{username}/status?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Update user account status (active/inactive).</p><p><strong>Body:</strong> Status information</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Users List</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/users?prefix={prefix}&username={username}&token={token}&secure={token_secure}&group={group}&search={search}&deleted={deleted}&friends={only_friends}&admin={admin_screen}&offset={offset}&fetch={fetch}</code></div><p><strong>Description:</strong> Get paginated list of users with filtering options.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Search Users</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/users/{search}?prefix={prefix}&username={username}&token={token}&group={group}&offset={offset}&fetch={fetch}</code></div><p><strong>Description:</strong> Search for users by query.</p><p><strong>Returns:</strong> Matching users list</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Reset User</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/user/{username}/reset?prefix={prefix}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Reset user account and send activation email.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Send User Invite</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/user/{username}/invite?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Send invitation email to user.</p></div></div>
+            
+            <h3 id="password-management">3. Password Management</h3>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Set Password</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/password?prefix={prefix}&username={username}&token={token}&secure={token_secure}&twofactor={two_factor}</code></div><p><strong>Description:</strong> Set initial password for user.</p><p><strong>Body:</strong> Password information</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Reset/Change Password</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method put">PUT</span> <code>/rest/password?prefix={prefix}&username={username}&token={token}&secure={token_secure}&twofactor={two_factor}</code></div><p><strong>Description:</strong> Change existing password.</p><p><strong>Body:</strong> Old and new password</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Delete Password</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/password?prefix={prefix}&username={username}&token={token}&secure={token_secure}&password={password}&target={target_username}</code></div><p><strong>Description:</strong> Remove password for specified user.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Check Password Status</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/password?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Check if user has password set and 2FA status.</p></div></div>
+
+            <h3 id="group-management">4. Group Management</h3>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Create Group</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/group?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Create a new group.</p><p><strong>Body:</strong> Group name and properties</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Group Information</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/group/{group}?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Get detailed information about a specific group.</p><p><strong>Returns:</strong> Group details, members, policies</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>List Groups</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/groups?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Get list of all groups.</p><p><strong>Returns:</strong> Array of group summaries</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Update Group</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method put">PUT</span> <code>/rest/group/{group}?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Update group properties.</p><p><strong>Body:</strong> Updated group fields</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Delete Group</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/group/{group}?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Delete a group.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Add/Remove Users from Group</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/group/{group}/users?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Bulk add/remove users to/from group.</p><p><strong>Body:</strong> <code>{remove: [usernames], add: [usernames]}</code></p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Group Members</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/group/{group}/users?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> List all members of a group.</p><p><strong>Returns:</strong> Array of user information</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Update Group Admin</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method put">PUT</span> <code>/rest/group/{group}/admin?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Update group administrator.</p><p><strong>Body:</strong> New admin username</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Group Storage</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/group/{group}/storage?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Get storage configuration for group.</p></div></div>
+            
+            <h3 id="policy-template">5. Policy & Template Management</h3>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Edit Group Policy</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/group/{group}/policy?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Edit policies for a group.</p><p><strong>Body:</strong> Policy configuration</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Edit User Policy</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/user/{username}/policy?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Edit policies for a specific user.</p><p><strong>Body:</strong> Policy configuration</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Templates</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/templates?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Get list of available templates.</p><p><strong>Returns:</strong> Template list</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Template Details</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/template/{template}?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Get specific template information.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get User Templates</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/user/templates?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Get templates associated with user's groups.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Update Template</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method put">PUT</span> <code>/rest/template/{template}?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Update template configuration.</p></div></div>
+
+            <h3 id="document-management">6. Document Management</h3>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Document Information</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/document/{url}?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Get document metadata and information.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>List Documents</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/documents/{folder}?prefix={prefix}&username={username}&token={token}&secure={token_secure}&deleted={show_deleted}&role={role}</code></div><p><strong>Description:</strong> List documents in a folder.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Document Count</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/document_count/{folder}?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Count documents in folder.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Begin Multipart Upload</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/begin_add_document?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Start multipart document upload.</p><p><strong>Returns:</strong> Upload session ID</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>End Multipart Upload</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/end_add_document?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Complete multipart upload.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Upload Document Block</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/add_document_block_batch?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Upload document block in multipart upload.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Upload Single Document</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/document/{url}?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Upload complete document in single request.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Delete Document</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/document/{url}?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Mark document as deleted.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Delete Document Version</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/document_version/{url}?prefix={prefix}&username={username}&token={token}&secure={token_secure}&document_id={document_id}</code></div><p><strong>Description:</strong> Delete specific version of document.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Undelete Document</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method put">PUT</span> <code>/rest/document/{url}?prefix={prefix}&username={username}&token={token}&secure={token_secure}&devicename={devicename}</code></div><p><strong>Description:</strong> Restore deleted document.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Document Versions</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/document_versions/{url}?prefix={prefix}&username={username}&token={token}&secure={token_secure}&timestamp={timestamp}&duration={duration}</code></div><p><strong>Description:</strong> Get version history of document.</p></div></div>
+
+            <h3 id="file-folder">7. File & Folder Management</h3>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>List Files</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/files/{folder}?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Efficiently list files in folder.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get File Information</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/file/{url}?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Get minimal file information.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Update File</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method put">PUT</span> <code>/rest/file/{url}?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Update file properties.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Add File</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/file?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Add new file reference.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>List Folders</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/folders/{folder}?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Get subfolders in folder.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Search</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/search?prefix={prefix}&username={username}&token={token}&q={query}</code></div><p><strong>Description:</strong> Search for documents and files.</p></div></div>
+
+            <h3 id="content-delivery">8. Content Delivery</h3>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Download Content</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/content/{url}?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Download file content.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Content as Base64</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/content/base64/{url}?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Get file content encoded as base64.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Download as ZIP</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/content/zip/{url}?prefix={prefix}&username={username}&token={token}&mesh={mesh}&secure={token_secure}&password={password}&strong={strong}</code></div><p><strong>Description:</strong> Download multiple files as ZIP.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Download Shared Content</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/content/shared/{url}?token={share_token}&company={company}</code></div><p><strong>Description:</strong> Download content using share token. No authentication required.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Shared Object</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/document/shared/{url}?token={share_token}&company={company}</code></div><p><strong>Description:</strong> Get shared document information. No authentication required.</p></div></div>
+            
+            <h3 id="sharing-collaboration">9. Sharing & Collaboration</h3>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Share Single Document</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/document/share?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Create share link for single document.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Share Multiple Documents</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/documents/share?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Create share link for multiple documents.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Delete Share</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/share/{token}?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Remove share link.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Send Share Email</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/share/email?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Send email with share links.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Friends List</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/friends?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Get user's friends list.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Search Friends</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/friends/search?prefix={prefix}&username={username}&token={token}&q={query}</code></div><p><strong>Description:</strong> Search for friends.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Add Friend</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/friend?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Add user as friend.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Delete Friend</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/friend/{friend}?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Remove friend.</p></div></div>
+
+            <h3 id="email-messaging">10. Email & Messaging</h3>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Send Email Message</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/email?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Send email to users.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Send Group Email</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/email/group/{group}?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Send email to all group members.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Email Destinations</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/email/destinations?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Get saved email destinations.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Create Email Destination</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/email/destination?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Save email destination.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Delete Email Destination</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/email/destination/{id}?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Remove saved email destination.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Update Messages Read Status</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method put">PUT</span> <code>/rest/messages/read?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Mark messages as read.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Send Feedback</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/feedback?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Send feedback to administrators.</p></div></div>
+            
+            <h3 id="system-admin">11. System Administration</h3>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Initialize System</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/init?prefix={prefix}</code></div><p><strong>Description:</strong> Initialize new SureDrop instance. No authentication required.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Update Initialization</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/update_init?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Update system initialization.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get/Update Settings</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/settings?prefix={prefix}&username={username}&token={token}</code></div><div class="api-endpoint-path"><span class="api-method put">PUT</span> <code>/rest/setting?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Get or update system settings.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Maintenance Mode</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/maintenance?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Enable maintenance mode and logout users.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Update Branding</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/brand?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Update company branding.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Update Core Options</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/UpdateCoreOptions?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/UpdateCoreOptionsBase64?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Update core system options.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Certificate Management</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/certificate?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Get certificate information.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Company Information</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/company/{name}</code></div><p><strong>Description:</strong> Get company information by name. No authentication required.</p></div></div>
+
+            <h3 id="device-management">12. Device Management</h3>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Register Device</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/device?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Register new device.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Remove Device</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/device/{device}?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Unregister device.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Ping/Pong (Connectivity)</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/ping</code></div><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/pong</code></div><p><strong>Description:</strong> Test API connectivity. No authentication required.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Authenticated Ping</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/pinga?prefix={prefix}&username={username}&token={token}&secure={token_secure}&ttl={ttl}</code></div><p><strong>Description:</strong> Test connectivity with authentication.</p></div></div>
+
+            <h3 id="monitoring-analytics">13. Monitoring & Analytics</h3>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Log Metric</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/LogMetric?prefix={prefix}&username={username}&token={token}&secure={token_secure}&name={name}</code></div><p><strong>Description:</strong> Log custom metric.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get User Sessions</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/user/sessions?prefix={prefix}&username={username}&token={token}&secure={token_secure}</code></div><p><strong>Description:</strong> Get active user sessions.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Summary Statistics</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/stats/summary?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Get system summary statistics.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Mesh Information</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/mesh?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Get storage mesh topology.</p></div></div>
+
+            <h3 id="utility-functions">14. Utility Functions</h3>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Version</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/version</code></div><p><strong>Description:</strong> Get API version information. No authentication required.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Hello (Test)</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/hello?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Test endpoint with authentication.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get Environment</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/getenv</code></div><p><strong>Description:</strong> Get environment configuration. No authentication required.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Check Block Hashes</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/blocks/check?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Check which block hashes exist in storage.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Health Check</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/health?company={prefix}</code></div><p><strong>Description:</strong> Check system health.</p></div></div>
+            
+            <h3 id="database-ops">15. Database Operations</h3>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Update Database</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/updatedatabase?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Update database to latest schema version.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get User Groups Data</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/user/groups?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Get data for all groups user belongs to.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Get User Group Data</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/group/{group}/data?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Get specific group data for user.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-header"><h4>Update User Group Data</h4></div><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method put">PUT</span> <code>/rest/group/{group}/data?prefix={prefix}&username={username}&token={token}</code></div><p><strong>Description:</strong> Update user's data within a group.</p></div></div>
+        </section>
+
+        <section id="error-handling">
+            <h2>Error Handling</h2>
+            <p>Endpoints return standardized JSON responses. A successful response includes <code>"error": "noerror"</code>, while a failed request provides a descriptive error message.</p>
+            <h4>Success Response Example:</h4>
+            <pre><code>{
+  "error": "noerror",
+  "groupId": "3d529494-2048-4923-8f01-e5a7179f82e4"
+}</code></pre>
+            <h4>Error Response Example:</h4>
+            <pre><code>{
+  "error": "Error message description"
+}</code></pre>
+            <h4>Common HTTP Response Codes:</h4>
+            <table>
+                <thead>
+                    <tr><th>Code</th><th>Status</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>200</code></td><td>OK</td><td>The request was successful.</td></tr>
+                    <tr><td><code>400</code></td><td>Bad Request</td><td>The request was malformed or had invalid parameters.</td></tr>
+                    <tr><td><code>401</code></td><td>Unauthorized</td><td>Authentication failed; the token is invalid or expired.</td></tr>
+                    <tr><td><code>403</code></td><td>Forbidden</td><td>The user does not have permission to perform the action.</td></tr>
+                    <tr><td><code>404</code></td><td>Not Found</td><td>The requested resource could not be found.</td></tr>
+                    <tr><td><code>500</code></td><td>Internal Server Error</td><td>An unexpected error occurred on the server.</td></tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <section id="tldr">
+            <h2>TL;DR - Practical Examples</h2>
+            <p>This trace is taken from an actual session of logging into SureDrop, creating a group, a folder, and uploading a file.</p>
+            
+            <div class="tldr-case"><div class="tldr-case-header">Case 1: GET /company</div><div class="tldr-case-body"><h5>Description</h5><p>Used to configure the UX expectations before logging in.</p><h5>Request Path</h5><pre><code>:method: GET
+:path: /rest/company?prefix=Winter+Is+Coming</code></pre><h5>Response Body (200 OK)</h5><pre><code>{
+  "init": "true",
+  "company_name": "Winter Is Coming",
+  "storage_tokan": "SureDrop",
+  "brandedcompany": "Winter Is Coming",
+  "version": "2.11.0",
+  "app_version": "2.11.0",
+  "www_portal": "https://portal.suredrop.dev",
+  "brandedlogo": "https://suredrop-downloads.s3-ap-southeast-2.amazonaws.com/winter-is-coming.png",
+  "brandedmessage": "Terms and Conditions of Use: \nBy using SureDrop you agree that data transmitted and/or stored by SureDrop are covered by governing laws and data may be required to be provided to a lawful third party. Where applicable, export-controlled information transmitted to a foreign jurisdiction may require a Data and Services Export Authorization approval. \n\nFor more information on SureDrop user terms and conditions email info@senetas.com.",
+  "opt_2fa": "False",
+  "rest_endpoints": "https://portal.suredrop.dev",
+  "azure_application_id": "d8335fd2-fa2f-498a-be4b-3c539e386738",
+  "azure_tenant_id": "09ff7a38-0498-4f9b-94e5-3d487e8cdd17",
+  "opt_azure": "False",
+  "maintenance": "",
+  "optSta": "True",
+  "opt_my_documents": "3",
+  "staOptions": "{\"ClientId\":\"b9d047d9-1b3f-4e8c-b53d-03d63eb59f08\",\"AuthEndpoint\":\"https://idp.eu.safenetid.com/auth/realms/IZ29RN7ZI9-STA/protocol/openid-connect/auth\"}",
+  "feature_toggles": ""
+}</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 2: POST /session</div><div class="tldr-case-body"><h5>Description</h5><p>Used to obtain a session token (log into Suredrop).</p><h5>Request Path</h5><pre><code>:method: POST
+:path: /rest/session?prefix=Winter+Is+Coming&username=administrator</code></pre><h5>Request Body</h5><pre><code>{"password":"&lt;PASSWORD&gt;","timeout":15,"token":""}</code></pre><h5>Response Body (200 OK)</h5><pre><code>{"token":"UR3_ZIzoS15WVpZIBS8D7LMMS2VkSbnRgDvcPivqdZo"}</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 3: GET /user/data</div><div class="tldr-case-body"><h5>Description</h5><p>Get generic information on a user for UX purposes.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/user/data?prefix=Winter+Is+Coming&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>{
+  "navbarPinned": true,
+  "username": "administrator",
+  "FailedLoginAttempt": {
+    "failed": 0,
+    "maxRetries": 5
+  },
+  "shadow": "",
+  "navbarCollapsed": false
+}</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 4: GET /pinga</div><div class="tldr-case-body"><h5>Description</h5><p>Do an authorized ping on the API.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/pinga?prefix=Winter+Is+Coming&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>{"pinga":"ponga"}</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 5: GET /user</div><div class="tldr-case-body"><h5>Description</h5><p>Get information on the user.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/user?prefix=Winter+Is+Coming&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>{
+  "level": "3",
+  "roles": {
+    "Restricted": true,
+    "Standard": true,
+    "Power": true,
+    "Admin": true,
+    "Forensic": true
+  },
+  "has_password": "true",
+  "two_factor": "none",
+  "source": "local",
+  "timestamp": "1627959777526",
+  "first_name": "admin",
+  "last_name": "admin",
+  "email": "admin@suredrop.com.au",
+  "mobile": "+",
+  "plan": "",
+  "paid": "",
+  "group_name": "_users",
+  "unique_id": "0000000000000000",
+  "status": "ACTIVATED",
+  "username": "administrator"
+}</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 6: POST /rest/user/data</div><div class="tldr-case-body"><h5>Description</h5><p>Save configuration data for a user.</p><h5>Request</h5><pre><code>:method: POST
+:path: /rest/user/data?prefix=Winter+Is+Coming&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Request Body</h5><pre><code>{"navbarPinned":true,"username":"administrator","FailedLoginAttempt":{"failed":0,"maxRetries":5},"shadow":"","navbarCollapsed":false}</code></pre><h5>Response Body (200 OK)</h5><pre><code>{"error":"noerror"}</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 7: GET /mesh</div><div class="tldr-case-body"><h5>Description</h5><p>Get a storage mesh.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/mesh?prefix=Winter+Is+Coming&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>[
+  {
+    "id": "876560df-1d5d-463c-bd0f-b08040daeaec",
+    "name": "Backup",
+    "status": "Online - Writable",
+    "ip_address": "http://storage-server-backup",
+    "public_ip_address": ""
+  },
+  {
+    "id": "32577efe-e4d2-4ee8-a821-e430938cc65b",
+    "name": "Primary",
+    "status": "Online - Writable",
+    "ip_address": "http://storage-server",
+    "public_ip_address": ""
+  }
+]</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 8: GET /groups</div><div class="tldr-case-body"><h5>Description</h5><p>Get a list of groups.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/groups?prefix=Winter+Is+Coming&role=Forensic&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>[
+  {
+    "group": "57897d5a-2d5d-4638-abbb-7e08d92094e3",
+    "status": "ACTIVATED",
+    "admin": "auto.admin",
+    "description": "Automation test",
+    "unique_id": "Auto",
+    "templates": "Office 365"
+  },
+  {
+    "group": "ed3a4a49-7cfc-4ca0-b8ef-ff9dbd5b6fc4",
+    "status": "ACTIVATED",
+    "admin": "auto.admin",
+    "description": "Automation test",
+    "unique_id": "Auto Admin",
+    "templates": ""
+  }
+]</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 9: GET /group/[group]</div><div class="tldr-case-body"><h5>Description</h5><p>Get the details of a group.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/group/57897d5a-2d5d-4638-abbb-7e08d92094e3?prefix=Winter+Is+Coming&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>{
+  "admin": "auto.admin",
+  "copies": "2",
+  "secure": "no",
+  "group_status": "ACTIVATED",
+  "lifetime": "NEVER",
+  "unique_id": "Auto",
+  "description": "Automation test"
+}</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 10: GET /members/[group]/users</div><div class="tldr-case-body"><h5>Description</h5><p>Get a list of the group members.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/members/57897d5a-2d5d-4638-abbb-7e08d92094e3/users?prefix=Winter+Is+Coming&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>[
+  {
+    "username": "adrian",
+    "first_name": "Adrian",
+    "last_name": "Tankard",
+    "initials": "AT",
+    "email": "adrian.tankard@senetas.com",
+    "mobile": "+"
+  },
+  {
+    "username": "adrian.tankard@suredrop.com.au",
+    "first_name": "Adrian",
+    "last_name": "Tankard",
+    "initials": "AT",
+    "email": "adrian.tankard@suredrop.com.au",
+    "mobile": "+"
+  }
+]</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 11: GET /folders/[group]</div><div class="tldr-case-body"><h5>Description</h5><p>Get a list of the folders in a group.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/folders/57897d5a-2d5d-4638-abbb-7e08d92094e3?prefix=Winter+Is+Coming&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>[
+  {
+    "folder": "/57897d5a-2d5d-4638-abbb-7e08d92094e3/Votiro/Import Folder 4",
+    "deleted": "no",
+    "created_date": "1624919768427",
+    "modified_date": "1624926475128",
+    "metadata": null
+  }
+]</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 12: GET /templates/[group]/1</div><div class="tldr-case-body"><h5>Description</h5><p>Get a list of templates that have been applied to the group.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/templates/57897d5a-2d5d-4638-abbb-7e08d92094e3/1?prefix=Winter+Is+Coming&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>[
+  {
+    "name": "Office 365",
+    "type": "POLICY"
+  }
+]</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 13: GET /storage/[group]</div><div class="tldr-case-body"><h5>Description</h5><p>Get the storage servers associated with a group.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/storage/57897d5a-2d5d-4638-abbb-7e08d92094e3?prefix=Winter+Is+Coming&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>[
+  {
+    "id": "32577efe-e4d2-4ee8-a821-e430938cc65b",
+    "name": "Primary"
+  },
+  {
+    "id": "876560df-1d5d-463c-bd0f-b08040daeaec",
+    "name": "Backup"
+  }
+]</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 14: GET /templates</div><div class="tldr-case-body"><h5>Description</h5><p>Get a list of all of the available templates.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/templates?prefix=Winter+Is+Coming&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>[
+  { "name": "Automatically Deflate Files", "type": "POLICY", "data": "DEFLATE:YES" },
+  { "name": "Disable Sharing", "type": "POLICY", "data": "SHARING:NO" },
+  { "name": "Standard User", "type": "SECURITY", "data": "..." }
+]</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 15: GET /storage</div><div class="tldr-case-body"><h5>Description</h5><p>Calculate a storage mesh and cache it in suredrop.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/storage?format=cache&prefix=Winter+Is+Coming&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>{"mesh":"f6f8c71d-da57-4d0e-902e-7be4d9586461"}</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 16: GET /template/[template name]</div><div class="tldr-case-body"><h5>Description</h5><p>Get the content of a specific template.</p><h5>Request</h5><pre><code>:path: /rest/template/Office%20365?prefix=Winter+Is+Coming&username=administrator
+:authority: portal.suredrop.dev</code></pre><h5>Response Body (200 OK)</h5><pre><code>{
+  "type": "POLICY",
+  "data": "O365:YES"
+}</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 17: GET /users</div><div class="tldr-case-body"><h5>Description</h5><p>Get a list of the users.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/users?prefix=Winter+Is+Coming&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>[
+  {
+    "username": "administrator",
+    "first_name": "admin",
+    "last_name": "admin",
+    "initials": "AA",
+    "email": "admin@suredrop.com.au",
+    "status": "ACTIVATED",
+    "source": "local",
+    "roles": { "Admin": true, ... }
+  }
+]</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 18: GET /documents/[group]/path</div><div class="tldr-case-body"><h5>Description</h5><p>Get a list of the documents.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/documents/57897d5a-2d5d-4638-abbb-7e08d92094e3?deleted=false&prefix=Winter+Is+Coming&role=Forensic
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>[
+  {
+    "url": "/57897d5a-2d5d-4638-abbb-7e08d92094e3/20210808_130543.jpg",
+    "timestamp": "1628501256914",
+    "filesize": "3661871",
+    "document_id": "04d829da-34c5-43a7-98c9-0c6d5b627c94",
+    "name": "20210808_130543.jpg",
+    "username": "auto.standard"
+  }
+]</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 19: GET /settings</div><div class="tldr-case-body"><h5>Description</h5><p>Get the settings.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/settings?prefix=Winter+Is+Coming&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>{
+  "admin_email": "admin@suredrop.com.au",
+  "company_email": "admin@suredrop.com.au",
+  "brandedcompany": "Winter Is Coming",
+  "version": "2.11.0",
+  ...
+}</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 20: GET /get_summary_stats</div><div class="tldr-case-body"><h5>Description</h5><p>Gets the summary stats for the user.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/get_summary_stats?prefix=Winter+Is+Coming&target_username=administrator&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>[
+  { "sort": "1", "name": "Group Memberships", "value": "4", "display": "1" },
+  { "sort": "2", "name": "Groups Owned", "value": "4", "display": "1" },
+  ...
+]</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 21: GET /activation</div><div class="tldr-case-body"><h5>Description</h5><p>Gets the activation details.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/activation?prefix=Winter+Is+Coming&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>{
+  "distributer": "SUREDROP",
+  "users": "1000",
+  "storage": "0",
+  "start_date": "15apr2021",
+  "end_date": "15apr2022",
+  "type": "P",
+  "num": "01",
+  "signature": "Valid"
+}</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 22: POST /group</div><div class="tldr-case-body"><h5>Description</h5><p>Adds a group.</p><h5>Request</h5><pre><code>:method: POST
+:path: /rest/group?prefix=Winter+Is+Coming&username=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Request Body</h5><pre><code>{"name":"This is a new group","storage":["Backup","Primary"],"description":""}</code></pre><h5>Response Body (200 OK)</h5><pre><code>{
+  "error": "noerror",
+  "groupId": "3d529494-2048-4923-8f01-e5a7179f82e4"
+}</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 23: GET /user/data</div><div class="tldr-case-body"><h5>Description</h5><p>Gets details on a user.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/user/data?prefix=Winter+Is+Coming&username=administrator&target=administrator
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>{
+  "level": "3",
+  "roles": {
+    "Restricted": true,
+    "Standard": true,
+    ...
+  },
+  "username": "administrator"
+}</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 24: GET /notifications/[group]</div><div class="tldr-case-body"><h5>Description</h5><p>Gets all of the notifications that have happened in a group in the last 32 seconds.</p><h5>Request</h5><pre><code>:method: GET
+:path: /rest/notifications/3d529494-2048-4923-8f01-e5a7179f82e4?prefix=Winter+Is+Coming&seconds=32
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Response Body (200 OK)</h5><pre><code>[ { "query_timestamp": "1628554079231" } ]</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 25: POST /folder/[group]/[folder name]</div><div class="tldr-case-body"><h5>Description</h5><p>Create a folder.</p><h5>Request</h5><pre><code>:method: POST
+:path: /rest/folder/3d529494-2048-4923-8f01-e5a7179f82e4/This%20is%20a%20new%20folder?prefix=Winter+Is+Coming
+authorization: Basic OlVSM19aSXpvUzE1V1ZwWklCUzhEN0xNTVMyVmtTYm5SZ0R2Y1BpdnFkWm8=</code></pre><h5>Request Body</h5><pre><code>{}</code></pre><h5>Response Body (200 OK)</h5><pre><code>{"error":"noerror"}</code></pre></div></div>
+            <div class="tldr-case"><div class="tldr-case-header">Case 26: POST /document/[group]/[path and filename]</div><div class="tldr-case-body"><h5>Description</h5><p>Upload a simple file to suredrop.</p><h5>Request</h5><pre><code>:method: POST
+:path: /rest/document/3d529494-2048-4923-8f01-e5a7179f82e4/This%20is%20a%20new%20folder/IMG_0487.HEIC?prefix=Winter%20Is%20Coming&username=administrator&token=...&raw=raw</code></pre><h5>Request Body</h5><pre><code>&lt;RAW FILE CONTENTS&gt;</code></pre></div></div>
+
+        </section>
+
+        <section id="swagger-list">
+            <h2>Full API Endpoint List</h2>
+            <p>The following is a complete reference of all API endpoints available, as generated from the Swagger documentation.</p>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/activation</code></div><p><strong>Summary:</strong> Activation</p><p><strong>Description:</strong> Activation</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/activation_shared</code></div><p><strong>Summary:</strong> Activate shared</p><p><strong>Description:</strong> Activate shared</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/add_document_block_batch/{url}</code></div><p><strong>Summary:</strong> Upload Document Part</p><p><strong>Description:</strong> Upload a multipart document part</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/add_document_block_batch_shared/{url}</code></div><p><strong>Summary:</strong> Upload Document Part (Share)</p><p><strong>Description:</strong> Upload a multipart document part from an anonymous share</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/AddDocumentNotification/{url}</code></div><p><strong>Summary:</strong> Add Document Notification</p><p><strong>Description:</strong> Add a notification for a document</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/addUserToGroupViaLink</code></div><p><strong>Summary:</strong> Add User to Group via Link</p><p><strong>Description:</strong> Adds an existing user to a group using a shared link ID</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/audits</code></div><p><strong>Summary:</strong> Get Audit Activity</p><p><strong>Description:</strong> Gets system activity for auditing purposes</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/begin_add_document/{url}</code></div><p><strong>Summary:</strong> Begin Add Document Parts</p><p><strong>Description:</strong> Start a multipart upload of a document</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/begin_add_document_shared/{url}</code></div><p><strong>Summary:</strong> Begin Add Document Parts (Share)</p><p><strong>Description:</strong> Start a multipart upload of a document from an anonymous share</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/certificate</code></div><p><strong>Summary:</strong> Authorises a User</p><p><strong>Description:</strong> Authorises a new user, users must be authorised to make them active</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/clone/{url}</code></div><p><strong>Summary:</strong> Clone Documents</p><p><strong>Description:</strong> Clone a list of documents within the same group</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/company</code></div><p><strong>Summary:</strong> Get Company Info</p><p><strong>Description:</strong> Get the info on a company name</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/content/{url}</code></div><p><strong>Summary:</strong> Get Document Content</p><p><strong>Description:</strong> Gets the content of a document</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/createRestrictedUser</code></div><p><strong>Summary:</strong> Create a User</p><p><strong>Description:</strong> Creates a new user</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/device</code></div><p><strong>Summary:</strong> Delete device</p><p><strong>Description:</strong> Deletes a device</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/device</code></div><p><strong>Summary:</strong> Add Device</p><p><strong>Description:</strong> Add a device to the device table</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/document/{url}</code></div><p><strong>Summary:</strong> Get Document Info</p><p><strong>Description:</strong> Get the information on a document</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/document/{url}</code></div><p><strong>Summary:</strong> Upload Document</p><p><strong>Description:</strong> Upload a document</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/document/{url}</code></div><p><strong>Summary:</strong> Delete a Document</p><p><strong>Description:</strong> Mark a document as deleted</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method put">PUT</span> <code>/rest/document/{url}</code></div><p><strong>Summary:</strong> Undelete a Document</p><p><strong>Description:</strong> Mark a document as undeleted</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/document/shared/{url}</code></div><p><strong>Summary:</strong> Upload Document (Share)</p><p><strong>Description:</strong> Upload a document from an anonymous share</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/document_count/{folder}</code></div><p><strong>Summary:</strong> Document Count</p><p><strong>Description:</strong> Count documents</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/document_version/{url}</code></div><p><strong>Summary:</strong> Get Document Version</p><p><strong>Description:</strong> Gets the version of a document</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/document_versions/{url}</code></div><p><strong>Summary:</strong> Get Document Version</p><p><strong>Description:</strong> Gets the version of the document</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/documents</code></div><p><strong>Summary:</strong> Delete a List of Documents</p><p><strong>Description:</strong> Mark a list of documents as deleted</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/documents/{folder}</code></div><p><strong>Summary:</strong> Get Folder Document Info</p><p><strong>Description:</strong> Get all of the document info for a folder...this is a rich call and should be avoided unless absolutely necessary by using /files/{folder}</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/email/destination</code></div><p><strong>Summary:</strong> Creates Email Destination</p><p><strong>Description:</strong> Creates an email destination for sharing</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/email/destination</code></div><p><strong>Summary:</strong> Delete email</p><p><strong>Description:</strong> Delete email destination</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/email/destinations</code></div><p><strong>Summary:</strong> Get User Emails</p><p><strong>Description:</strong> Gets a list of all the user emails</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/end_add_document/{url}</code></div><p><strong>Summary:</strong> End a Add Document Parts</p><p><strong>Description:</strong> End a multipart upload of a document</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/end_add_document_shared/{url}</code></div><p><strong>Summary:</strong> End a Add Document Parts (Share)</p><p><strong>Description:</strong> End a multipart upload of a document from an anonymous share</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/feedback</code></div><p><strong>Summary:</strong> SendFeedback</p><p><strong>Description:</strong> Send feedback to the suredrop admin</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method put">PUT</span> <code>/rest/file/{url}</code></div><p><strong>Summary:</strong> Add file</p><p><strong>Description:</strong> Adds a file</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/file/{url}</code></div><p><strong>Summary:</strong> Get File Info</p><p><strong>Description:</strong> Lightweight call for getting minimal information on a file</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/file/{url}</code></div><p><strong>Summary:</strong> Update file</p><p><strong>Description:</strong> Updates a file</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/files/{folder}</code></div><p><strong>Summary:</strong> Get Folder File Info</p><p><strong>Description:</strong> Get all of the file info for a folder...this is an efficient call and should be used over /documents/{url}</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/files/all/{folder}</code></div><p><strong>Summary:</strong> Get Group Folder Info</p><p><strong>Description:</strong> Get all of the folders and subfolders in a group</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/files/all/share/{folder}</code></div><p><strong>Summary:</strong> Get downstream files in a folder</p><p><strong>Description:</strong> Get all of the folders and files in a group</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/folder/{url}</code></div><p><strong>Summary:</strong> Get Folder Info</p><p><strong>Description:</strong> Get lightweight information on a folder</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/folder/{url}</code></div><p><strong>Summary:</strong> Delete Folder</p><p><strong>Description:</strong> Mark a folder as deleted</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/folder/{url}</code></div><p><strong>Summary:</strong> Create Folder</p><p><strong>Description:</strong> Create a folder</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/folders</code></div><p><strong>Summary:</strong> Create Folders</p><p><strong>Description:</strong> Create a list of folders</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/folders</code></div><p><strong>Summary:</strong> Delete Folders</p><p><strong>Description:</strong> Delete a list of folders</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/folders/{folder}</code></div><p><strong>Summary:</strong> Get Sub Folder Info</p><p><strong>Description:</strong> Lightweight call for getting subfolders in this folder</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/folders/dest</code></div><p><strong>Summary:</strong> Create Destination Folders</p><p><strong>Description:</strong> Create a list of folders at a destination location</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/friend</code></div><p><strong>Summary:</strong> Create Friend</p><p><strong>Description:</strong> Creates a friend</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method delete">DELETE</span> <code>/rest/friend</code></div><p><strong>Summary:</strong> Delete friend</p><p><strong>Description:</strong> Deletes a friend</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/friends</code></div><p><strong>Summary:</strong> Get friends</p><p><strong>Description:</strong> Returns a list of friends</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/friends/{search}</code></div><p><strong>Summary:</strong> Get friends</p><p><strong>Description:</strong> Get friends search</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/get_audit</code></div><p><strong>Summary:</strong> Get Audit</p><p><strong>Description:</strong> Retrieves audit logs based on specific filters such as time range and target user.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/get_document_notifications</code></div><p><strong>Summary:</strong> Get Document Notifications</p><p><strong>Description:</strong> Retrieves doc notifications with filters like time range and target user.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/get_document_notifications_by_url/{url}</code></div><p><strong>Summary:</strong> Document Notifications</p><p><strong>Description:</strong> Retrieves document notifications based on a specific URL.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/get_session_tokens</code></div><p><strong>Summary:</strong> Get Session Tokens</p><p><strong>Description:</strong> Retrieves session tokens for users, showing recent successful login timestamps.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/get_shared_document_files</code></div><p><strong>Summary:</strong> Get Shared Files</p><p><strong>Description:</strong> Retrieves shared document files based on specific filters such as time range and target user.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/get_shared_documents</code></div><p><strong>Summary:</strong> Get Share Documents</p><p><strong>Description:</strong> Retrieves shared documents based on specific filters such as time range and target user.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/get_storage_stats</code></div><p><strong>Summary:</strong> Get Storage Stats</p><p><strong>Description:</strong> Retrieves storage statistics based on interval, user, and offset.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/get_summary_stats</code></div><p><strong>Summary:</strong> Get Summary Stats</p><p><strong>Description:</strong> Retrieves summary statistics for users and groups with filtering options.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/getenv</code></div><p><strong>Summary:</strong> Get environment</p><p><strong>Description:</strong> Get a list of the configurable environment</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/GetNewToken</code></div><p><strong>Summary:</strong> Get New Token</p><p><strong>Description:</strong> Generates a new session token with specified timeout and read-only flag.</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/GetSharedGroupPrettyName</code></div><p><strong>Summary:</strong> Get shared group pretty name</p><p><strong>Description:</strong> Get group pretty name from an ad-hoc shared folder only. </p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method post">POST</span> <code>/rest/group</code></div><p><strong>Summary:</strong> Create Group</p><p><strong>Description:</strong> Create a new group</p></div></div>
+            <div class="api-endpoint"><div class="api-endpoint-details"><div class="api-endpoint-path"><span class="api-method get">GET</span> <code>/rest/group/{group}</code></div><p><strong>Summary:</strong> Get Group</p><p><strong>
